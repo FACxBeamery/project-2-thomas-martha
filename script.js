@@ -1,14 +1,14 @@
 function journeyPlanner(form){
-    
-    // var fromPostcode = form.fromPostcode.value;
-    // var toPostcode = form.toPostcode.value;
-    // var journeyPreference = form.journeyPreference.value;
-    //var accessibility = form.accessibility.value;
-    var fromPostcode = "UB5 5DD";
-    var toPostcode = "EC2A 1NT";
-    const journeyPreference = 'leasttime';
-    const accessibilityPreference = 'stepFreeToPlatform';
-    const app_id = '70020f2';
+    var fromPostcode = form.fromPostcode.value;
+    var toPostcode = form.toPostcode.value;
+    var journeyPreference = form.journeyPreference.value;
+    var accessibilityPreference = (form.accessible.value)?('stepFreeToPlatform'):('NoRequirements');
+    console.log([fromPostcode,toPostcode,journeyPreference,accessibilityPreference]);
+    //var fromPostcode = "UB5 5DD";
+    //var toPostcode = "EC2A 1NT";
+    //const journeyPreference = 'leasttime';
+    //const accessibilityPreference = 'stepFreeToPlatform';
+    const app_id = '70020f2b';
     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
 
     fromPostcode = fromPostcode.trim().toUpperCase();
@@ -24,21 +24,29 @@ function journeyPlanner(form){
         return false;
     }
 
-
     const encodedFromPostcode = encodeURI(fromPostcode);
     const encodedToPostcode = encodeURI(toPostcode);
-    
+
     var data = null;
     var xhr = new XMLHttpRequest();
     
     xhr.addEventListener("readystatechange", function () {
       if (xhr.readyState === 4) {
-        console.log(JSON.parse(xhr.responseText));
+        console.log('hello');
+        let outputText = JSON.parse(xhr.responseText).journeys[0];
+        console.log(outputText.legs.length);
+        for (let leg=0; leg<outputText.legs.length; leg++){
+            let node = document.createElement("LI");
+            console.log(leg.instruction.summary);
+            var textnode = document.createTextNode(leg.instruction.summary);
+            node.appendChild(textnode);
+            document.getElementById("routeList").appendChild(node);
+        }
       }
     });
     
-    // var apiURL = `http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
-    var apiURL = "https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/UB55DD/to/EC2A1NT?app_id=70020f2b&app_key=0ad0be8e2fd2ff1e875dff40d2beec28&journeyPreference=leastwalking&accessibilityPreference=stepFreeToPlatform"
+    var apiURL = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
+    
     xhr.open("GET", apiURL, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     xhr.send(data);
@@ -51,14 +59,8 @@ document.addEventListener('input', function (event) {
             event.target.value = event.target.value.substring(0, event.target.value.length - 1);
         }
     }
+
 }, false);
-
-
-document.getElementById('fromPostcode').addEventListener('input', (event) => {
-    // get the value of the target 
-    
-    
-});
 
 function validatePostcode(postcode){
     const regex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
