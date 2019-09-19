@@ -4,39 +4,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css?family=Inconsolata:400,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=DM+Serif+Text&display=swap" rel="stylesheet">
     <title>Journey Planner</title>
 </head>
 <body>
     <header class="header">
-        <img src="https://assets-ouch.icons8.com/preview/621/46ea933b-0255-435b-8858-df3f198a91c9.png" data-v-46d07f1a alt="A train in a station">
+        <img src="https://assets-ouch.icons8.com/preview/621/46ea933b-0255-435b-8858-df3f198a91c9.png" data-v-46d07f1a alt="A train in a station" id="header-img">
         <h1 class="header__title">Journey Planner</h1>
-        <h2 class="header__subtitle">Find your fastest journey </h2>
+        <h2 class="header__subtitle">Find your fastest route</h2>
     </header>
 
     <main>
         <form action="" class="form" id="form">
-            <label class="form__label" for="fromPostcode" placeholder = "W6 8EL">From:</label>
-            <input class="form__input" required type="text" name="fromPostcode" id="fromPostcode">
-            <label class="form__label" for="toPostcode" placeholder = "EC2A 1NT">To:</label>
-            <input class="form__input" required type="text" name="toPostcode" id="toPostcode">
+            <div id="details-wrapper">
+                <div id="box-wrapper">
+                <div class="label-input-wrapper">
+                    <label class="form__label" for="fromPostcode">From:</label>
+                    <input class="form__input" required type="text" name="fromPostcode" id="fromPostcode" class="postcode">
+                </div>
+                <div class="label-input-wrapper">
+                    <label class="form__label" for="toPostcode">To:</label>
+                    <input class="form__input" required type="text" name="toPostcode" id="toPostcode" class="postcode">
+                </div>   
+                </div> 
+                <div id="beamery-button-wrapper">
+                        <button class="form__button" type="button" id="beamery-button" onclick="document.getElementById('toPostcode').value = 'EC2A 1NT';">
+                                <p class = "wide-screen">take me to</p><img src="beamery.png" alt="Beamery" id="beamery-big-img" class="wide-screen">
+                                <img src="beamery-small.png" alt="Beamery" id="beamery-small-img" class="small-screen">
+                                
+                        </button>
+                </div>
+                </div>
+                </div>
 
-            <input class="" type="radio" name="journeyPreference" value="leasttime" id="leasttime" checked>
-            <label class="form__label" for="leasttime">Least Time</label>
-            <input class="" type="radio" name="journeyPreference" value="leastwalking" id="leastwalking">
-            <label class="form__label" for="leastwalking">Least Walking</label>
-            <input class="" type="radio" name="journeyPreference" value="leastinterchange" id="leastinterchange">
-            <label class="form__label" for="leastinterchange">Least Interchange</label>
+            </div>
 
-            <input type="checkbox" name="accessible" value="accessible" id="accessible"> 
-            <label class="form__label" for="accesible">Make my journey accessible</label>
+            <div id="preferences-wrapper">
+                <div class="label-input-wrapper-2">
+                    <label class="form__label" for="journeyPreference">Journey Preference</label>
+                <select name="journeyPreference" id = "journeyPreference">
+                        <option value="leasttime">Least Time</option>
+                        <option value="leastwalking">Least Walking</option>
+                        <option value="leastinterchange">Least Interchange</option>
+                </select>
+            </div>
+
+            <div class="label-input-wrapper-2">
+                <label class="form__label" for="accesible">Accesible?</label>
+                <input type="checkbox" name="accessible" value="accessible" id="accessible"> 
+            </div>
+
+            </div>
 
             <div id="form__buttons-wrapper">
-                <button class="form__button" type="button" id="test-button" onclick="journeyPlanner(this.form)">GO</button>
+                <button class="form__button" type="button" id="test-button" onclick="journeyPlanner(this.form)"><p id="go"> GO</p></button>
             </div>
         </form>
         <section class="section">
-            <p class="section__heading">We will reactively test your input with some password criteria</p>
+            <p class="section__heading">Here is your optimal route:</p>
             <div id="routeContainer">
                     <!-- <ul id="routeList">
                     </ul> -->
