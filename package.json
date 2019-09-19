@@ -1,0 +1,23 @@
+{
+  "name": "project-2-thomas-martha",
+  "version": "1.0.0",
+  "description": "Week 2 project Thomas and Martha",
+  "main": "script.js",
+  "scripts": {
+    "test": "node test.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FACxBeamery/project-2-thomas-martha.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FACxBeamery/project-2-thomas-martha/issues"
+  },
+  "homepage": "https://github.com/FACxBeamery/project-2-thomas-martha#readme",
+  "dependencies": {
+    "tap": "^14.6.4",
+    "tape": "^4.11.0"
+  }
+}
