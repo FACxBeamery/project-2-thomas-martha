@@ -27,20 +27,25 @@ function journeyPlanner(form){
     const encodedFromPostcode = encodeURI(fromPostcode);
     const encodedToPostcode = encodeURI(toPostcode);
 
+/*---------------------------------------------JOURNEY-------------------------------------*/
+
     var data = null;
     var xhr = new XMLHttpRequest();
     
     xhr.addEventListener("readystatechange", function () {
       if (xhr.readyState === 4) {
-        console.log('hello');
-        let outputText = JSON.parse(xhr.responseText).journeys[0];
-        console.log(outputText.legs.length);
-        for (let leg=0; leg<outputText.legs.length; leg++){
-            let node = document.createElement("LI");
-            console.log(leg.instruction.summary);
-            var textnode = document.createTextNode(leg.instruction.summary);
-            node.appendChild(textnode);
-            document.getElementById("routeList").appendChild(node);
+          let outputText = JSON.parse(xhr.responseText).journeys["0"];
+          console.log(outputText);
+          console.log('hello');
+          addJourneySteps(`Duration = ${outputText.duration}`);
+          for (let leg = 0; leg < outputText.legs.length; leg++){
+            let x = `Leave at ${outputText.legs[leg].depatureTime} and ${outputText.legs[leg].instruction.summary}` 
+            addJourneySteps(x);
+            //     let node = document.createElement("LI");
+        //     console.log(leg.instruction.summary);
+        //     var textnode = document.createTextNode(leg.instruction.summary);
+        //     node.appendChild(textnode);
+        //     document.getElementById("routeList").appendChild(node);
         }
       }
     });
@@ -50,6 +55,12 @@ function journeyPlanner(form){
     xhr.open("GET", apiURL, true);
     xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     xhr.send(data);
+
+/*---------------------------------------------END OF JOURNEY-------------------------------------*/
+
+/*---------------------------------------------STATUS-------------------------------------*/
+checkLineStatus('victoria');
+/*---------------------------------------------END OF STATUS-------------------------------------*/
 }
 
 document.addEventListener('input', function (event) {
@@ -62,7 +73,47 @@ document.addEventListener('input', function (event) {
 
 }, false);
 
+
 function validatePostcode(postcode){
     const regex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
     return regex.test(postcode) 
 }
+
+const checkLineStatus = (line) => {
+        
+    var dataStatus = null;
+    var xhrStatus = new XMLHttpRequest();
+    
+    xhrStatus.addEventListener("readystatechange", function () {
+      if (xhrStatus.readyState === 4) {
+        let outputTextStatus = JSON.parse(xhrStatus.responseText);
+        console.log(outputTextStatus);
+      }
+    });
+    
+    var apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/${line}/Status?app_id=70020f2b&app_key=0ad0be8e2fd2ff1e875dff40d2beec28`;
+
+    xhrStatus.open("GET", apiURLStatus, true);
+    xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhrStatus.send(dataStatus);
+};
+
+const addJourneySteps = (message) => {
+    // const routeContainer = document.getElementById('routeContainer');
+    const msg1 = document.createElement("p");
+    const node1 = document.createTextNode(message);
+    // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
+    msg1.appendChild(node1);
+    document.getElementById('routeContainer').appendChild(msg1);
+};
+
+
+// var apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/${line}/Status?app_id=70020f2b&app_key=0ad0be8e2fd2ff1e875dff40d2beec28`;
+// var apiURLJourney = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
+    
+
+// apiCalls = () => {
+//     const app_id = '70020f2b';
+//     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
+
+// };
