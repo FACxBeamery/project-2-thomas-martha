@@ -2,7 +2,6 @@ window.addEventListener("load", () => {
 
     const app_id = '70020f2b';
     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
-    console.log('start');
     let dataStatus = null;
     let xhrStatus = new XMLHttpRequest();
 
@@ -10,7 +9,6 @@ window.addEventListener("load", () => {
         const colours=['#B36305', '#E32017', '#FFD300', '#00782A', '#F3A9BB', '#A0A5A9', '#9B0056', '#000000', '#0098D4', '#95CDBA']
         if (xhrStatus.readyState === 4) {
             let outputTextStatus = JSON.parse(xhrStatus.responseText);
-            console.log(outputTextStatus);
 
             const table = document.createElement("table");
             const tableBody = document.createElement("tbody");
@@ -44,6 +42,12 @@ window.addEventListener("load", () => {
     xhrStatus.open("GET", apiURLStatus, true);
     xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     xhrStatus.send(dataStatus);
+
+     xhrStatus.onload = () => {
+         if (xhrStatus.status != 200){
+             alert(`Error ${xhrStatus.status}: ${xhrStatus.statusText}`)
+         }
+     }
     
 });
 
@@ -90,7 +94,8 @@ function journeyPlanner(form){
             console.log(outputTextJourney);
             let journeyStartTime = outputTextJourney.startDateTime;
             let journeyEndTime = outputTextJourney.arrivalDateTime;
-            addJourneySteps(`Leave at ${(journeyStartTime.slice( (journeyStartTime.indexOf('T') + 1), (journeyStartTime.length - 3)))} to arrive at ${(journeyEndTime.slice( (journeyEndTime.indexOf('T') + 1), (journeyEndTime.length - 3)))}. Duration = ${outputTextJourney.duration} minutes.`);
+            addJourneySteps(`Duration:  ${outputTextJourney.duration} minutes`)
+            addJourneySteps(`Leave at ${(journeyStartTime.slice( (journeyStartTime.indexOf('T') + 1), (journeyStartTime.length - 3)))} to arrive at ${(journeyEndTime.slice( (journeyEndTime.indexOf('T') + 1), (journeyEndTime.length - 3)))}.`);
             
             for (let leg = 0; leg < outputTextJourney.legs.length; leg++){
 
@@ -110,6 +115,12 @@ function journeyPlanner(form){
     xhrJourney.open("GET", apiURLJourney, true);
     xhrJourney.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhrJourney.send(dataJourney);
+
+    xhrJourney.onload = () => {
+        if (xhrJourney.status != 200){
+            alert(`Error ${xhrJourney.status}: ${xhrJourney.statusText}`)
+        }
+    }
 
 /*--------------------------------------------- END OF JOURNEY ---------------------------------------------*/
 
@@ -138,7 +149,6 @@ const getJourney = () => {
     xhrJourney.addEventListener("readystatechange", () => {
         if (xhrJourney.readyState === 4) {
             let outputTextJourney = JSON.parse(xhrJourney.responseText).journeys["0"];
-            console.log(outputTextJourney);
             addJourneySteps(`Leave at ${outputTextJourney.startDateTime} to arrive at ${outputTextJourney.arrivalDateTime}. Duration = ${outputTextJourney.duration}`);
             
             for (let leg = 0; leg < outputTextJourney.legs.length; leg++){

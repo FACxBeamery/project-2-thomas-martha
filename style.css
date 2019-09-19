@@ -161,6 +161,7 @@ table {
     width: 70vw;
     background-color: white;
     color: black;
+    text-align: left;
 }
 
 #journeyContainer {
