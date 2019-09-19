@@ -1,76 +1,155 @@
+window.addEventListener("load", () => {
+
+    const app_id = '70020f2b';
+    const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
+    console.log('start');
+    let dataStatus = null;
+    let xhrStatus = new XMLHttpRequest();
+
+    xhrStatus.addEventListener("readystatechange", () => {
+        if (xhrStatus.readyState === 4) {
+            let outputTextStatus = JSON.parse(xhrStatus.responseText);
+            console.log(outputTextStatus);
+
+            const table = document.createElement("table");
+            const tableBody = document.createElement("tbody");
+            
+            for (let line = 0; line < outputTextStatus.length; line++){
+                
+                const tableRow = document.createElement("tr");
+                const tableCellLeft = document.createElement("td");
+                const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
+                tableCellLeft.appendChild(tableCellLeftText);
+                tableRow.appendChild(tableCellLeft);
+
+                for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
+                    const tableCellRight = document.createElement("td");
+                    const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
+                    tableCellRight.appendChild(tableCellRightText);
+                    tableRow.appendChild(tableCellRight);
+                }
+                tableBody.appendChild(tableRow);
+            }
+            table.appendChild(tableBody);
+            document.getElementById("statusContainer").appendChild(table);
+        }
+    });
+
+    const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
+
+    xhrStatus.open("GET", apiURLStatus, true);
+    xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhrStatus.send(dataStatus);
+
+});
+
 function journeyPlanner(form){
-    var fromPostcode = form.fromPostcode.value;
-    var toPostcode = form.toPostcode.value;
-    var journeyPreference = form.journeyPreference.value;
-    var accessibilityPreference = (form.accessible.value)?('stepFreeToPlatform'):('NoRequirements');
-    console.log([fromPostcode,toPostcode,journeyPreference,accessibilityPreference]);
-    //var fromPostcode = "UB5 5DD";
-    //var toPostcode = "EC2A 1NT";
-    //const journeyPreference = 'leasttime';
-    //const accessibilityPreference = 'stepFreeToPlatform';
+    let fromPostcode = form.fromPostcode.value.trim().toUpperCase();
+    let toPostcode = form.toPostcode.value.trim().toUpperCase();
+    let journeyPreference = form.journeyPreference.value;
+    let accessibilityPreference = (form.accessible.value)?('stepFreeToPlatform'):('NoRequirements');
+
+    let encodedFromPostcode = encodeURI(fromPostcode);
+    let encodedToPostcode = encodeURI(toPostcode);
+
     const app_id = '70020f2b';
     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
 
-    fromPostcode = fromPostcode.trim().toUpperCase();
-    toPostcode = toPostcode.trim().toUpperCase();
+    const regex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
 
-    if (!validatePostcode(fromPostcode)){
-        //print error message
-        return false;
-    }
-    
-    if (!validatePostcode(toPostcode)){
-        //print error message
-        return false;
+    if (!(regex.test(fromPostcode))) {
+        addPostcodeWarning("Make sure the postcodes you have entered are valid London and Greater London postcodes.");
+        return;
     }
 
-    const encodedFromPostcode = encodeURI(fromPostcode);
-    const encodedToPostcode = encodeURI(toPostcode);
+/*--------------------------------------------- RESET ---------------------------------------------*/
 
-/*---------------------------------------------JOURNEY-------------------------------------*/
+    resetJourneySteps();
+    resetStatusTable();
 
-    var data = null;
-    var xhr = new XMLHttpRequest();
+/*--------------------------------------------- END OF RESET ---------------------------------------------*/
+/*--------------------------------------------- JOURNEY ---------------------------------------------*/
     
-    xhr.addEventListener("readystatechange", function () {
-      if (xhr.readyState === 4) {
-          let outputText = JSON.parse(xhr.responseText).journeys["0"];
-          console.log(outputText);
-          console.log('hello');
-          addJourneySteps(`Duration = ${outputText.duration}`);
-          for (let leg = 0; leg < outputText.legs.length; leg++){
-            let x = `Leave at ${outputText.legs[leg].depatureTime} and ${outputText.legs[leg].instruction.summary}` 
-            addJourneySteps(x);
-            //     let node = document.createElement("LI");
-        //     console.log(leg.instruction.summary);
-        //     var textnode = document.createTextNode(leg.instruction.summary);
-        //     node.appendChild(textnode);
-        //     document.getElementById("routeList").appendChild(node);
+    let dataJourney = null;
+    let xhrJourney = new XMLHttpRequest();
+
+    xhrJourney.addEventListener("readystatechange", () => {
+        if (xhrJourney.readyState === 4) {
+            let outputTextJourney = JSON.parse(xhrJourney.responseText).journeys["0"];
+            console.log(outputTextJourney);
+            addJourneySteps(`Leave at ${outputTextJourney.startDateTime} to arrive at ${outputTextJourney.arrivalDateTime}. Duration = ${outputTextJourney.duration}`);
+            
+            for (let leg = 0; leg < outputTextJourney.legs.length; leg++){
+
+                if (outputTextJourney.legs[leg].mode.id !== 'walking') {
+                    if (outputTextJourney.legs[leg].instruction.detailed) {
+                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, getting off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
+                        addJourneySteps(journeyStep);
+                    }
+                } else {
+                    let journeyStep = `${outputTextJourney.legs[leg].instruction.summary}.`;
+                    addJourneySteps(journeyStep);
+                }
+            }
         }
-      }
     });
-    
-    var apiURL = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
-    
-    xhr.open("GET", apiURL, true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-    xhr.send(data);
 
-/*---------------------------------------------END OF JOURNEY-------------------------------------*/
+    let apiURLJourney = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
 
-/*---------------------------------------------STATUS-------------------------------------*/
-checkLineStatus('victoria');
-/*---------------------------------------------END OF STATUS-------------------------------------*/
-}
+    xhrJourney.open("GET", apiURLJourney, true);
+    xhrJourney.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhrJourney.send(dataJourney);
+
+/*--------------------------------------------- END OF JOURNEY ---------------------------------------------*/
+/*--------------------------------------------- STATUS ---------------------------------------------*/
+    // let dataStatus = null;
+    // let xhrStatus = new XMLHttpRequest();
+
+    // xhrStatus.addEventListener("readystatechange", () => {
+    //     if (xhrStatus.readyState === 4) {
+    //         let outputTextStatus = JSON.parse(xhrStatus.responseText);
+    //         console.log(outputTextStatus);
+
+    //         const table = document.createElement("table");
+    //         const tableBody = document.createElement("tbody");
+            
+    //         for (let line = 0; line < outputTextStatus.length; line++){
+                
+    //             const tableRow = document.createElement("tr");
+    //             const tableCellLeft = document.createElement("td");
+    //             const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
+    //             tableCellLeft.appendChild(tableCellLeftText);
+    //             tableRow.appendChild(tableCellLeft);
+
+    //             for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
+    //                 const tableCellRight = document.createElement("td");
+    //                 const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
+    //                 tableCellRight.appendChild(tableCellRightText);
+    //                 tableRow.appendChild(tableCellRight);
+    //             }
+    //             tableBody.appendChild(tableRow);
+    //         }
+    //         table.appendChild(tableBody);
+    //         document.getElementById("statusContainer").appendChild(table);
+    //     }
+    // });
+
+    // const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
+
+    // xhrStatus.open("GET", apiURLStatus, true);
+    // xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    // xhrStatus.send(dataStatus);
+
+/*--------------------------------------------- END OF STATUS ---------------------------------------------*/
+
+};
 
 document.addEventListener('input', function (event) {
-
     if (event.target.attributes["name"].value == "fromPostcode" || event.target.attributes["name"].value == "toPostcode") {
-        if((/\W/).test(event.data)) {
+        if((/\W/).test(event.data) && event.data != ' ') {
             event.target.value = event.target.value.substring(0, event.target.value.length - 1);
         }
     }
-
 }, false);
 
 
@@ -79,27 +158,92 @@ function validatePostcode(postcode){
     return regex.test(postcode) 
 }
 
-const checkLineStatus = (line) => {
-        
-    var dataStatus = null;
-    var xhrStatus = new XMLHttpRequest();
+
+const getJourney = () => {
+
+    let dataJourney = null;
+    let xhrJourney = new XMLHttpRequest();
+
+    xhrJourney.addEventListener("readystatechange", () => {
+        if (xhrJourney.readyState === 4) {
+            let outputTextJourney = JSON.parse(xhrJourney.responseText).journeys["0"];
+            console.log(outputTextJourney);
+            addJourneySteps(`Leave at ${outputTextJourney.startDateTime} to arrive at ${outputTextJourney.arrivalDateTime}. Duration = ${outputTextJourney.duration}`);
+            
+            for (let leg = 0; leg < outputTextJourney.legs.length; leg++){
+
+                if (outputTextJourney.legs[leg].mode.id !== 'walking') {
+                    if (outputTextJourney.legs[leg].instruction.detailed) {
+                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, getting off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
+                        addJourneySteps(journeyStep);
+                    }
+                } else {
+                    let journeyStep = `${outputTextJourney.legs[leg].instruction.summary}.`;
+                    addJourneySteps(journeyStep);
+                }
+            }
+        }
+    });
+
+    let apiURLJourney = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
+
+    xhrJourney.open("GET", apiURLJourney, true);
+    xhrJourney.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhrJourney.send(dataJourney);
+};
+
+
+const checkAllLineStatus = () => {
+
+    let dataStatus = null;
+    let xhrStatus = new XMLHttpRequest();
     
-    xhrStatus.addEventListener("readystatechange", function () {
-      if (xhrStatus.readyState === 4) {
-        let outputTextStatus = JSON.parse(xhrStatus.responseText);
-        console.log(outputTextStatus);
-      }
+    xhrStatus.addEventListener("readystatechange", () => {
+        if (xhrStatus.readyState === 4) {
+            let outputTextStatus = JSON.parse(xhrStatus.responseText);
+            console.log(outputTextStatus);
+
+            const table = document.createElement("table");
+            const tableBody = document.createElement("tbody");
+            
+            for (let line = 0; line < outputTextStatus.length; line++){
+                
+                const tableRow = document.createElement("tr");
+                const tableCellLeft = document.createElement("td");
+                const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
+                tableCellLeft.appendChild(tableCellLeftText);
+                tableRow.appendChild(tableCellLeft);
+
+                for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
+                    const tableCellRight = document.createElement("td");
+                    const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
+                    tableCellRight.appendChild(tableCellRightText);
+                    tableRow.appendChild(tableCellRight);
+                }
+                tableBody.appendChild(tableRow);
+            }
+            table.appendChild(tableBody);
+            document.getElementById("statusContainer").appendChild(table);
+        }
     });
     
-    var apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/${line}/Status?app_id=70020f2b&app_key=0ad0be8e2fd2ff1e875dff40d2beec28`;
+    const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
 
     xhrStatus.open("GET", apiURLStatus, true);
     xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
     xhrStatus.send(dataStatus);
 };
 
+const addPostcodeWarning = (message) => {
+    const msg1 = document.createElement("p");
+    const node1 = document.createTextNode(message);
+    // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
+    msg1.appendChild(node1);
+    document.getElementById('postcodeWarningContainer').appendChild(msg1);
+};
+
+
 const addJourneySteps = (message) => {
-    // const routeContainer = document.getElementById('routeContainer');
     const msg1 = document.createElement("p");
     const node1 = document.createTextNode(message);
     // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
@@ -108,12 +252,11 @@ const addJourneySteps = (message) => {
 };
 
 
-// var apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/${line}/Status?app_id=70020f2b&app_key=0ad0be8e2fd2ff1e875dff40d2beec28`;
-// var apiURLJourney = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
-    
+const resetJourneySteps = () => {
+    document.getElementById('routeContainer').innerHTML = '';
+};
 
-// apiCalls = () => {
-//     const app_id = '70020f2b';
-//     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
 
-// };
+const resetStatusTable = () => {
+    document.getElementById('statusContainer').innerHTML = '';
+};
