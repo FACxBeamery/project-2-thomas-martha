@@ -1,3 +1,48 @@
+window.addEventListener("load", () => {
+
+    const app_id = '70020f2b';
+    const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
+    console.log('start');
+    let dataStatus = null;
+    let xhrStatus = new XMLHttpRequest();
+
+    xhrStatus.addEventListener("readystatechange", () => {
+        if (xhrStatus.readyState === 4) {
+            let outputTextStatus = JSON.parse(xhrStatus.responseText);
+            console.log(outputTextStatus);
+
+            const table = document.createElement("table");
+            const tableBody = document.createElement("tbody");
+            
+            for (let line = 0; line < outputTextStatus.length; line++){
+                
+                const tableRow = document.createElement("tr");
+                const tableCellLeft = document.createElement("td");
+                const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
+                tableCellLeft.appendChild(tableCellLeftText);
+                tableRow.appendChild(tableCellLeft);
+
+                for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
+                    const tableCellRight = document.createElement("td");
+                    const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
+                    tableCellRight.appendChild(tableCellRightText);
+                    tableRow.appendChild(tableCellRight);
+                }
+                tableBody.appendChild(tableRow);
+            }
+            table.appendChild(tableBody);
+            document.getElementById("statusContainer").appendChild(table);
+        }
+    });
+
+    const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
+
+    xhrStatus.open("GET", apiURLStatus, true);
+    xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhrStatus.send(dataStatus);
+
+});
+
 function journeyPlanner(form){
     let fromPostcode = form.fromPostcode.value.trim().toUpperCase();
     let toPostcode = form.toPostcode.value.trim().toUpperCase();
@@ -57,43 +102,43 @@ function journeyPlanner(form){
 
 /*--------------------------------------------- END OF JOURNEY ---------------------------------------------*/
 /*--------------------------------------------- STATUS ---------------------------------------------*/
-    let dataStatus = null;
-    let xhrStatus = new XMLHttpRequest();
+    // let dataStatus = null;
+    // let xhrStatus = new XMLHttpRequest();
 
-    xhrStatus.addEventListener("readystatechange", () => {
-        if (xhrStatus.readyState === 4) {
-            let outputTextStatus = JSON.parse(xhrStatus.responseText);
-            console.log(outputTextStatus);
+    // xhrStatus.addEventListener("readystatechange", () => {
+    //     if (xhrStatus.readyState === 4) {
+    //         let outputTextStatus = JSON.parse(xhrStatus.responseText);
+    //         console.log(outputTextStatus);
 
-            const table = document.createElement("table");
-            const tableBody = document.createElement("tbody");
+    //         const table = document.createElement("table");
+    //         const tableBody = document.createElement("tbody");
             
-            for (let line = 0; line < outputTextStatus.length; line++){
+    //         for (let line = 0; line < outputTextStatus.length; line++){
                 
-                const tableRow = document.createElement("tr");
-                const tableCellLeft = document.createElement("td");
-                const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
-                tableCellLeft.appendChild(tableCellLeftText);
-                tableRow.appendChild(tableCellLeft);
+    //             const tableRow = document.createElement("tr");
+    //             const tableCellLeft = document.createElement("td");
+    //             const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
+    //             tableCellLeft.appendChild(tableCellLeftText);
+    //             tableRow.appendChild(tableCellLeft);
 
-                for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
-                    const tableCellRight = document.createElement("td");
-                    const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
-                    tableCellRight.appendChild(tableCellRightText);
-                    tableRow.appendChild(tableCellRight);
-                }
-                tableBody.appendChild(tableRow);
-            }
-            table.appendChild(tableBody);
-            document.getElementById("statusContainer").appendChild(table);
-        }
-    });
+    //             for (let lineStatus = 0; lineStatus < outputTextStatus[line].lineStatuses.length; lineStatus++){
+    //                 const tableCellRight = document.createElement("td");
+    //                 const tableCellRightText = document.createTextNode(outputTextStatus[line].lineStatuses[lineStatus].statusSeverityDescription);
+    //                 tableCellRight.appendChild(tableCellRightText);
+    //                 tableRow.appendChild(tableCellRight);
+    //             }
+    //             tableBody.appendChild(tableRow);
+    //         }
+    //         table.appendChild(tableBody);
+    //         document.getElementById("statusContainer").appendChild(table);
+    //     }
+    // });
 
-    const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
+    // const apiURLStatus = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Line/Mode/tube/Status?app_id=${app_id}&app_key=${app_key}`;
 
-    xhrStatus.open("GET", apiURLStatus, true);
-    xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
-    xhrStatus.send(dataStatus);
+    // xhrStatus.open("GET", apiURLStatus, true);
+    // xhrStatus.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    // xhrStatus.send(dataStatus);
 
 /*--------------------------------------------- END OF STATUS ---------------------------------------------*/
 
