@@ -27,20 +27,21 @@ function journeyPlanner(form){
     const encodedFromPostcode = encodeURI(fromPostcode);
     const encodedToPostcode = encodeURI(toPostcode);
 
+    // const routeContainer = document.getElementById('routeContainer');
+    resetJourneySteps();
+
 /*---------------------------------------------JOURNEY-------------------------------------*/
 
     var data = null;
     var xhr = new XMLHttpRequest();
-    
+
     xhr.addEventListener("readystatechange", function () {
       if (xhr.readyState === 4) {
           let outputText = JSON.parse(xhr.responseText).journeys["0"];
           console.log(outputText);
-          console.log('hello');
-          addJourneySteps(`Duration = ${outputText.duration}`);
+          addJourneySteps(`Leave at ${outputText.startDateTime} to arrive at ${outputText.arrivalDateTime}. Duration = ${outputText.duration}`);
           for (let leg = 0; leg < outputText.legs.length; leg++){
-            let x = `Leave at ${outputText.legs[leg].depatureTime} and ${outputText.legs[leg].instruction.summary}` 
-            addJourneySteps(x);
+            addJourneySteps(outputText.legs[leg].instruction.summary);
             //     let node = document.createElement("LI");
         //     console.log(leg.instruction.summary);
         //     var textnode = document.createTextNode(leg.instruction.summary);
@@ -100,7 +101,7 @@ const checkLineStatus = (line) => {
 
 const addJourneySteps = (message) => {
     // const routeContainer = document.getElementById('routeContainer');
-    const msg1 = document.createElement("p");
+    const msg1 = document.createElement("P");
     const node1 = document.createTextNode(message);
     // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
     msg1.appendChild(node1);
@@ -117,3 +118,14 @@ const addJourneySteps = (message) => {
 //     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
 
 // };
+
+const journeyType = () => {
+    if (legs["0"].mode.id !== 'walking') {
+        return `Catch the ${legs["0"].instruction.summary}`;
+    }
+
+};
+
+const resetJourneySteps = () => {
+    document.getElementById('routeContainer').innerHTML = '';
+};
