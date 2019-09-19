@@ -41,12 +41,16 @@ function journeyPlanner(form){
           console.log(outputText);
           addJourneySteps(`Leave at ${outputText.startDateTime} to arrive at ${outputText.arrivalDateTime}. Duration = ${outputText.duration}`);
           for (let leg = 0; leg < outputText.legs.length; leg++){
-            addJourneySteps(outputText.legs[leg].instruction.summary);
-            //     let node = document.createElement("LI");
-        //     console.log(leg.instruction.summary);
-        //     var textnode = document.createTextNode(leg.instruction.summary);
-        //     node.appendChild(textnode);
-        //     document.getElementById("routeList").appendChild(node);
+
+            if (outputText.legs[leg].mode.id !== 'walking') {
+                if (outputText.legs[leg].instruction.detailed) {
+                    let journeyStep = `Catch the ${outputText.legs[leg].instruction.detailed}, getting off at ${outputText.legs[leg].arrivalPoint.commonName}.`;
+                    addJourneySteps(journeyStep);
+                }
+            } else {
+                let journeyStep = `${outputText.legs[leg].instruction.summary}.`;
+                addJourneySteps(journeyStep);
+            }
         }
       }
     });
@@ -54,7 +58,7 @@ function journeyPlanner(form){
     var apiURL = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=${accessibilityPreference}`;
     
     xhr.open("GET", apiURL, true);
-    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
     xhr.send(data);
 
 /*---------------------------------------------END OF JOURNEY-------------------------------------*/
@@ -101,6 +105,7 @@ const checkLineStatus = (line) => {
 
 const addJourneySteps = (message) => {
     // const routeContainer = document.getElementById('routeContainer');
+    
     const msg1 = document.createElement("P");
     const node1 = document.createTextNode(message);
     // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
