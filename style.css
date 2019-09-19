@@ -142,3 +142,30 @@ input {
         width:15rem;
     }
 }
+
+table {
+    background-color: white;
+    color: black;
+}
+
+#statusContainer {
+    display: flex;
+    justify-content: center;
+}
+
+#routeContainer {
+    display:flex;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 1rem;
+    width: 70vw;
+    background-color: white;
+    color: black;
+}
+
+#journeyContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}

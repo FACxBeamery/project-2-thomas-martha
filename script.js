@@ -7,6 +7,7 @@ window.addEventListener("load", () => {
     let xhrStatus = new XMLHttpRequest();
 
     xhrStatus.addEventListener("readystatechange", () => {
+        const colours=['#B36305', '#E32017', '#FFD300', '#00782A', '#F3A9BB', '#A0A5A9', '#9B0056', '#000000', '#0098D4', '#95CDBA']
         if (xhrStatus.readyState === 4) {
             let outputTextStatus = JSON.parse(xhrStatus.responseText);
             console.log(outputTextStatus);
@@ -15,8 +16,11 @@ window.addEventListener("load", () => {
             const tableBody = document.createElement("tbody");
             
             for (let line = 0; line < outputTextStatus.length; line++){
-                
                 const tableRow = document.createElement("tr");
+                tableRow.style.backgroundColor = colours[line]
+                if (line == 7){
+                    tableRow.style.color = '#FFF'
+                }
                 const tableCellLeft = document.createElement("td");
                 const tableCellLeftText = document.createTextNode(outputTextStatus[line].name);
                 tableCellLeft.appendChild(tableCellLeftText);
@@ -65,7 +69,8 @@ function journeyPlanner(form){
 /*--------------------------------------------- RESET ---------------------------------------------*/
 
     resetJourneySteps();
-    resetStatusTable();
+    // resetStatusTable();
+
 
 /*--------------------------------------------- END OF RESET ---------------------------------------------*/
 /*--------------------------------------------- JOURNEY ---------------------------------------------*/
@@ -83,7 +88,7 @@ function journeyPlanner(form){
 
                 if (outputTextJourney.legs[leg].mode.id !== 'walking') {
                     if (outputTextJourney.legs[leg].instruction.detailed) {
-                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, getting off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
+                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, get off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
                         addJourneySteps(journeyStep);
                     }
                 } else {
@@ -174,7 +179,7 @@ const getJourney = () => {
 
                 if (outputTextJourney.legs[leg].mode.id !== 'walking') {
                     if (outputTextJourney.legs[leg].instruction.detailed) {
-                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, getting off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
+                        let journeyStep = `Catch the ${outputTextJourney.legs[leg].instruction.detailed}, get off at ${outputTextJourney.legs[leg].arrivalPoint.commonName}.`;
                         addJourneySteps(journeyStep);
                     }
                 } else {
@@ -236,6 +241,8 @@ const checkAllLineStatus = () => {
 
 const addPostcodeWarning = (message) => {
     const msg1 = document.createElement("p");
+    msg1.style.backgroundColor = "#fdb814";
+    msg1.style.color= "#000";
     const node1 = document.createTextNode(message);
     // msg1.classList.add(''); //ADD CLASS NAME TO P ELEMENT.
     msg1.appendChild(node1);
