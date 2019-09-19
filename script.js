@@ -10,7 +10,12 @@ function journeyPlanner(form){
     const app_id = '70020f2b';
     const app_key = '0ad0be8e2fd2ff1e875dff40d2beec28';
 
-    
+    const regex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+
+    if (!(regex.test(fromPostcode))) {
+        addPostcodeWarning("Make sure the postcodes you have entered are valid London and Greater London postcodes.");
+        return;
+    }
 
 /*--------------------------------------------- RESET ---------------------------------------------*/
 
