@@ -170,3 +170,23 @@ table {
     align-items: center;
     flex-direction: column;
 }
+
+#test-button {
+    margin: auto;
+    border-radius: 1.05rem;
+    width: 10rem;
+    color: white;
+    background-color: #f14e23;
+    height: 3rem;
+    font-size: 1.5rem;
+    font-family: 'DM Serif Text', serif;
+    border-block-color: #f14e23;
+
+}
+
+#beamery-button {
+    margin: 0.5rem;
+    background-color: white;
+    border-radius: 0.5rem;
+    height:3rem;
+}
