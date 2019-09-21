@@ -1,6 +1,6 @@
 window.addEventListener("load", () => {
-  const app_id = "70020f2b";
-  const app_key = "0ad0be8e2fd2ff1e875dff40d2beec28";
+  //   const app_id = "70020f2b";
+  //   const app_key = "0ad0be8e2fd2ff1e875dff40d2beec28";
   let dataStatus = null;
   let xhrStatus = new XMLHttpRequest();
 
@@ -77,8 +77,8 @@ function journeyPlanner(form) {
   let encodedFromPostcode = encodeURI(fromPostcode);
   let encodedToPostcode = encodeURI(toPostcode);
 
-  const app_id = "70020f2b";
-  const app_key = "0ad0be8e2fd2ff1e875dff40d2beec28";
+  //   const app_id = "70020f2b";
+  //   const app_key = "0ad0be8e2fd2ff1e875dff40d2beec28";
 
   if (document.getElementById("accessible").checked) {
     var apiURLJourney = `https://cors-anywhere.herokuapp.com/http://api.tfl.gov.uk/Journey/JourneyResults/${encodedFromPostcode}/to/${encodedToPostcode}?app_id=${app_id}&app_key=${app_key}&journeyPreference=${journeyPreference}&accessibilityPreference=stepFreeToPlatform`;
