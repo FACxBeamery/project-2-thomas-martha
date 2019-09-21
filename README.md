@@ -22,3 +22,4 @@ As a user, I want to be able to see the best route (based on my preferences and 
 * [IMPROV]: Could include other location identifiers other than postcodes.
 * [IMPROV]: Keeping the API key private and importing it into script.js from a separate file.
 * [STR GOAL]: Be able to run the webpage from a local HTTP server, from a Docker container.
+* [BUG]: When there are multiple line statuses, currently, they create a new table column. As opposed to creating a new table column, they should be appended to the existing status column.
